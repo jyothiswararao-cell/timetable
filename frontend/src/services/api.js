@@ -32,13 +32,25 @@ api.interceptors.response.use(
   (error) => {
     if (error.response) {
       const { status } = error.response;
-      if (status === 401 && typeof window !== 'undefined') {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        if (window.location.pathname !== '/login') {
-          window.location.href = '/login';
+      if (status === 401) {
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          if (window.location.pathname !== '/login') {
+            window.location.href = '/login?expired=true';
+          }
         }
+        error.message = "Session expired. Please login again.";
+        if (error.response.data) error.response.data.error = "Session expired. Please login again.";
+      } else if (status === 403) {
+        error.message = "Access denied.";
+        if (error.response.data) error.response.data.error = "Access denied.";
+      } else if (status === 500) {
+        error.message = "Server error.";
+        if (error.response.data) error.response.data.error = "Server error.";
       }
+    } else {
+      error.message = "Server is offline or unreachable.";
     }
     return Promise.reject(error);
   }

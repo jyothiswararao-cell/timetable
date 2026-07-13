@@ -12,6 +12,13 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [expiredMsg, setExpiredMsg] = useState(false);
+
+  React.useEffect(() => {
+    if (typeof window !== 'undefined' && window.location.search.includes('expired=true')) {
+      setExpiredMsg(true);
+    }
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -22,6 +29,7 @@ export default function LoginPage() {
 
     setLoading(true);
     setError('');
+    setExpiredMsg(false);
 
     const result = await login(email, password);
     setLoading(false);
@@ -54,6 +62,13 @@ export default function LoginPage() {
               <div className="p-4 rounded-xl bg-rose-950/45 border border-rose-500/20 text-rose-200 flex items-center gap-3 text-sm animate-in fade-in slide-in-from-top-2">
                 <AlertTriangle className="w-5 h-5 text-rose-400 shrink-0" />
                 <span>{error}</span>
+              </div>
+            )}
+
+            {expiredMsg && (
+              <div className="p-4 rounded-xl bg-amber-950/45 border border-amber-500/20 text-amber-200 flex items-center gap-3 text-sm animate-in fade-in slide-in-from-top-2">
+                <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0" />
+                <span>Session expired. Please login again.</span>
               </div>
             )}
 
